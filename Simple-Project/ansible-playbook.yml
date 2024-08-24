@@ -3,50 +3,35 @@
   hosts: localhost
   connection: local
   tasks:
-
     - name: Login to Docker Hub
       docker_login:
         username: "islamoomostafa"
         password: "dckr_pat_P7B-z7nwcPmoAfswAW34QVj0wWA"
-        email: "islamoomostafa@gmail.com"
       ignore_errors: yes
 
     - name: Stop current running container if exists
-      docker_container:
-        name: web-container
-        state: stopped
+      command: docker stop web-container
       ignore_errors: yes
 
     - name: Remove stopped container if exists
-      docker_container:
-        name: web-container
-        state: absent
+      command: docker rm web-container
       ignore_errors: yes
 
     - name: Remove comingsoon-image if exists
-      docker_image:
-        name: islamoomostafa/comingsoon-page
-        state: absent
+      command: docker rmi islamoomostafa/comingsoon-page
       ignore_errors: yes
 
     - name: Build docker image using the Dockerfile
       docker_image:
-        name: islamoomostafa/comingsoon-page
+        name: "islamoomostafa/comingsoon-page"
         build:
-          path: .
-        state: present
+          path: "."
 
     - name: Push Image to Docker Hub
       docker_image:
-        name: islamoomostafa/comingsoon-page
-        tag: latest
+        name: "islamoomostafa/comingsoon-page"
         push: yes
 
     - name: Run container
-      docker_container:
-        name: web-container
-        image: islamoomostafa/comingsoon-page
-        state: started
-        ports:
-          - "5000:80"
-        detach: yes
+      command: docker run -d --name web-container -p 5000:80 islamoomostafa/comingsoon-page
+      ignore_errors: yes
