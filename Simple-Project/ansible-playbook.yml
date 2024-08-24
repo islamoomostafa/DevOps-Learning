@@ -12,14 +12,20 @@
     - name: Stop current running container if exists
       command: docker stop web-container
       ignore_errors: yes
+      register: stop_result
+      failed_when: stop_result.rc not in [0, 1]  # Ignore if container does not exist
 
     - name: Remove stopped container if exists
       command: docker rm web-container
       ignore_errors: yes
+      register: rm_result
+      failed_when: rm_result.rc not in [0, 1]  # Ignore if container does not exist
 
     - name: Remove comingsoon-image if exists
       command: docker rmi islamoomostafa/comingsoon-page
       ignore_errors: yes
+      register: rmi_result
+      failed_when: rmi_result.rc not in [0, 1]  # Ignore if image does not exist
 
     - name: Build docker image using the Dockerfile
       docker_image:
